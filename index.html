@@ -17,8 +17,27 @@
     </main>
 
     <div id="select-file">
-        <p>Pour commencer vous devez fournir le fichier au format tableur.</p>
-        <input type="file" id="input-excel" onchange="UserSelectFile(event)" accept=".xlsx,.xls,.csv" />
+        <!-- <fieldset action=""> -->
+            <!-- <legend>Test</legend> -->
+            <label for="input-excel">Pour commencer vous devez fournir le fichier au format tableur.</p>
+            <input type="file" id="input-excel" onchange="handleFileSelection(event)" accept=".xlsx,.xls,.csv" />
+        <!-- </fieldset> -->
+    </div>
+
+    <div id="descriptifs-fields">
+        <p>Veuillez choisir les champs descriptifs personnel (nom, prénom, email, promo). <br>
+        Pour plus d'informations visitez : (lien pas encore fait !)
+        
+        <br>
+        <br>
+
+        <select id="descriptif-select" multiple>
+
+
+        </select>
+        </p>
+
+        <button>Valider !</button>
     </div>
 
 

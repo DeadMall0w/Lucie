@@ -55,3 +55,55 @@ select[multiple] {
     background-color: #4e9af1;
     color: #000;
   }
+
+
+
+
+
+
+#container {
+    width: 100%;
+    display: flex;
+    border: none;
+    justify-content: space-around;
+    padding: 0px;
+    margin: 20px 0 0 0;
+}
+
+
+#container > div{
+    width: 32%;
+    padding: 0px;
+    margin: 0px;
+    color: rgb(255, 255, 255);
+    font-size: 24px ;
+    font-weight: bolder;
+}
+
+#category1{
+    background-color: rgb(255, 0, 0);
+}
+
+#category2{
+    background-color: rgb(182, 169, 0);
+}
+
+#category3{
+    background-color: green;
+}
+
+
+.category-container > h2 {
+    text-align: center;
+    font-size: 40px;
+    margin: 0px;
+    color: #FFF;
+    border-bottom: 1px solid white;
+    padding: 0px;
+}
+
+
+.element > p {
+    padding: 0px;
+    margin: 0px;
+}

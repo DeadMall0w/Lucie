@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Website</title>
+    <link rel="stylesheet" href="./styles.css">
+    <!-- nécessaire à l'utilisation de fichier tableur type excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- <link rel="icon" href="./favicon.ico" type="image/x-icon"> -->
+</head>
+<body>
+    <main>
+        <h1>Bienvenue dans Lucie !</h1>  
+    </main>
+
+    <div id="select-file">
+        <p>Pour commencer vous devez fournir le fichier au format tableur.</p>
+        <input type="file" id="input-excel" onchange="UserSelectFile(event)" accept=".xlsx,.xls,.csv" />
+    </div>
+
+
+</body>
+<script src="script.js"></script>
+</html>

@@ -1,0 +1,22 @@
+div
+{
+    border: 1px solid rgb(242, 242, 242);
+    padding: 15px;
+}
+
+body{
+    background-color: rgb(8, 0, 7);
+    color: rgb(128, 128, 128);
+}
+
+h1{
+    text-align: center;
+    text-decoration: underline;
+    font-weight: bold;
+    font-size: 35px;
+    background-color: rgb(29, 29, 29);
+    color: rgb(148, 83, 157);
+    margin: 0px;
+    margin-bottom: 15px;
+    padding: 15px;
+}

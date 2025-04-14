@@ -12,7 +12,7 @@ const container = document.getElementById("container");
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupField = document.getElementById("popupField");
-
+const noteInput = document.getElementById("noteInput");
 
 const descriptifFields = document.getElementById("descriptifs-fields");
 
@@ -24,6 +24,14 @@ const autoSelectedFields = ["prénom", "prenom", "nom", "promo", "tel"];
 let selectedPerson = -1;
 
 function init(){
+
+    // Demande une confirmation avant de faire de recharger la page
+    // window.addEventListener("beforeunload", function (e) {
+    //     e.preventDefault(); // Nécessaire pour certains navigateurs
+    //     e.returnValue = ""; // Obligatoire pour afficher le prompt de confirmation
+    // });
+
+
     container.style.display = "none";
     descriptifFields.style.display = "none";
     fileInputContainer.style.display = "block";
@@ -50,7 +58,7 @@ function handleFileSelection(event) {
 
         // On ajoute le champ catégorie à chaque objet
         spreadsheetData.forEach(obj => {
-            obj.categorie = 0;
+            obj._categorie = 0;
         });
 
         console.log(spreadsheetData);
@@ -121,12 +129,11 @@ function displayCommandes(){
 
 function createElements(){
     Object.entries(spreadsheetData).forEach(([key, value]) => {
-        // console.log(value.categorie);
-        if (value.categorie == 0){
+        if (value._categorie == 0){
             createCommandeElement(value, container1, key);
-        }else if(value.categorie == 1){
+        }else if(value._categorie == 1){
             createCommandeElement(value, container2, key);
-        }else if(value.categorie == 2){
+        }else if(value._categorie == 2){
             createCommandeElement(value, container3, key);
         }
     });
@@ -161,7 +168,12 @@ function createCommandeElement(data, parent, id) {
     //     fieldset.appendChild(p);
     // });
 
-    
+    if(data._note != ""){
+        const note = document.createElement("p");
+        note.classList.add("noteText");
+        note.textContent = data._note;
+        fieldset.appendChild(note);
+    }
     
     
     fieldset.addEventListener('click', function () {
@@ -185,6 +197,12 @@ function ShowPopup(element){
         }
     });
 
+    if(spreadsheetData[selectedPerson]._note != "" && spreadsheetData[selectedPerson]._note != undefined){
+        noteInput.value = spreadsheetData[selectedPerson]._note;
+    }else{
+        noteInput.value = "";
+    }
+
     KillAllChild(popupField);
 
     Object.entries(spreadsheetData[selectedPerson]).forEach(([key, value]) => {
@@ -200,24 +218,28 @@ function ShowPopup(element){
 
 function hidePopup(){
     popup.style.display = "none";
+    displayCommandes();    
 }
 
 function SwitchToPaidClass(){
-    spreadsheetData[selectedPerson].categorie = 2;
-    displayCommandes();
+    spreadsheetData[selectedPerson]._categorie = 2;
     hidePopup();
 }
 
 function SwitchToNoneServedClass(){
-    spreadsheetData[selectedPerson].categorie = 1;
-    displayCommandes();
+    spreadsheetData[selectedPerson]._categorie = 1;
     hidePopup();
 }
 
 function SwitchToNonePaidClass(){
-    spreadsheetData[selectedPerson].categorie = 0;
-    displayCommandes();
+    spreadsheetData[selectedPerson]._categorie = 0;
     hidePopup();
+}
+
+
+function changeCommandNote(){
+    // console.log(noteInput.value);
+    spreadsheetData[selectedPerson]["_note"] = noteInput.value;
 }
 
 // Don't worry, it's not real child, is it ?
@@ -226,6 +248,9 @@ function KillAllChild(element) {
         element.removeChild(element.firstChild);
     }
 }
+
+
+
 // Attache la fonction au champ fichier (si pas d'attribut inline dans HTML)
 // document.getElementById("input-excel").addEventListener("change", handleFileSelection);
 // TODO liste : 
@@ -233,11 +258,11 @@ function KillAllChild(element) {
 *D'abord l'utilisateur va donner le fichier excel
 Afficher les données dans un tableau pour être sûr que ca fonctionne bien ?
 *Ensuite le programme va demander quelles sont les champs descriptif (menu de sélection avec des cases à cocher, certaine cases coché de base si elles sont présente nom, email, prenon, classe, ect...)
-Une fois l'étape précédente validé, il sera sur une page divisé en 2, avec à gauche les personnes qui n'ont pas payé et à droite les personnes qui ont payé 
+*Une fois l'étape précédente validé, il sera sur une page divisé en 2, avec à gauche les personnes qui n'ont pas payé et à droite les personnes qui ont payé 
 Dans ces deux case ont peut filtrer avec la fonction de distance de leveintein 
-On peut transférer une personne d'un coté ou de l'autre
+*On peut transférer une personne d'un coté ou de l'autre
 En haut il y a le nombre de personne de chaque coté
-!Quand on clique sur une personne ca nous affiche tout les informations sur son menu
+*Quand on clique sur une personne ca nous affiche tout les informations sur son menu
 
 
 

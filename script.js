@@ -9,15 +9,25 @@ const container2 = document.getElementById("container2");
 const container3 = document.getElementById("container3");
 const container = document.getElementById("container");
 
-const descriptifFields = document.getElementById("descriptifs-fields");
-// Champs à sélectionner automatiquement (en minuscules)
-const autoSelectedFields = ["prénom", "prenom", "nom", "promo", "mail",  "tel"];
+const popup = document.getElementById("popup");
+const popupTitle = document.getElementById("popupTitle");
+const popupField = document.getElementById("popupField");
 
+
+const descriptifFields = document.getElementById("descriptifs-fields");
+
+
+// Champs à sélectionner automatiquement (en minuscules)
+const autoSelectedFields = ["prénom", "prenom", "nom", "promo", "tel"];
+
+
+let selectedPerson = -1;
 
 function init(){
     container.style.display = "none";
     descriptifFields.style.display = "none";
     fileInputContainer.style.display = "block";
+    popup.style.display = "none";
 }
 /*
  * Fonction appelée lors de la sélection d'un fichier Excel par l'utilisateur
@@ -37,6 +47,12 @@ function handleFileSelection(event) {
 
         // Conversion de la feuille en JSON
         spreadsheetData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        // On ajoute le champ catégorie à chaque objet
+        spreadsheetData.forEach(obj => {
+            obj.categorie = 0;
+        });
+
         console.log(spreadsheetData);
 
         // Cache l'input de fichier et génère le <select>
@@ -44,7 +60,7 @@ function handleFileSelection(event) {
         descriptifFields.style.display = "block";
         populateDescriptiveFieldsSelect();
     };
-
+    
     reader.readAsArrayBuffer(file);
 }
 
@@ -74,7 +90,7 @@ function populateDescriptiveFieldsSelect() {
 
 }
 
-// Fonction pour récuprer sur quels sont les éléments que l’utilisateur à coché 
+// Fonction pour récupérer sur quels sont les éléments que l’utilisateur à coché 
 function getSelectedOptionValues() {
     const selectedOptions = Array.from(selectElement.selectedOptions);
     selectedElements = selectedOptions.map(option => option.value);
@@ -82,40 +98,51 @@ function getSelectedOptionValues() {
 
 function UserValidateDescriptiveOptions(){
     getSelectedOptionValues();  // On récupère les données sélectionné par l'utilisateur  
-    createCommandes(); // On instancie toutes les commandes
+    displayCommandes(); // On instancie toutes les commandes
     descriptifFields.style.display = "none";
     container.style.display = "flex";
 }
 
 
-function createCommandes(){
+function displayCommandes(){
     // createCommandeElement();
     
     
     //! il faut tout supprimer avant 
+    KillAllChild(container1);
+    KillAllChild(container3);
+    KillAllChild(container2);
+
     // Instancie dans les trois containers
-    createCategory1Elements();
+    createElements();
     
 }
 
 
-function createCategory1Elements(){
+function createElements(){
     Object.entries(spreadsheetData).forEach(([key, value]) => {
-        createCommandeElement(value, container1);
+        // console.log(value.categorie);
+        if (value.categorie == 0){
+            createCommandeElement(value, container1, key);
+        }else if(value.categorie == 1){
+            createCommandeElement(value, container2, key);
+        }else if(value.categorie == 2){
+            createCommandeElement(value, container3, key);
+        }
     });
 }
 
 
 
-function createCommandeElement(data, parent) {
-    const fieldset = document.createElement("fieldset");
+function createCommandeElement(data, parent, id) {
+    const fieldset = document.createElement("div");
     fieldset.classList.add("element");
 
-    const legend = document.createElement("legend");
+    const legend = document.createElement("p");
 
     // TODO : Il y a moyen de regrouper les deux boucles en une seule même, mais est-ce vrm utile ?
 
-    // créé la légende
+    // créer la légende
     Object.entries(data).forEach(([key, value]) => { 
         if (selectedElements.includes(key)){ // TODO : rajouter un tri pour savoir quels éléments sont affiché en premier ?
             legend.textContent += value + " - ";
@@ -126,20 +153,79 @@ function createCommandeElement(data, parent) {
     fieldset.appendChild(legend);
 
     // Crée dynamiquement les <p> pour chaque champ à afficher
-    Object.entries(data).forEach(([key, value]) => {
-        if (selectedElements.includes(key)) return;
+    // Object.entries(data).forEach(([key, value]) => {
+    //     if (selectedElements.includes(key)) return;
 
-        const p = document.createElement("p");
-        p.textContent = `${key} : ${value}`;
-        fieldset.appendChild(p);
+    //     const p = document.createElement("p");
+    //     p.textContent = `${key} : ${value}`;
+    //     fieldset.appendChild(p);
+    // });
+
+    
+    
+    
+    fieldset.addEventListener('click', function () {
+        ShowPopup(this); // `this` ici fait référence à l'élément cliqué
     });
+
+    fieldset.id = id;
 
     parent.appendChild(fieldset);
 }
 
+// Fonction appelé quand on clique sur élément 
+function ShowPopup(element){
+    // console.log(spreadsheetData[element.id]);
+    popup.style.display = "block";
+    selectedPerson = element.id;
+    popupTitle.textContent = "";
+    Object.entries(spreadsheetData[selectedPerson]).forEach(([key, value]) => { 
+        if (selectedElements.includes(key)){ // TODO : rajouter un tri pour savoir quels éléments sont affiché en premier ?
+            popupTitle.textContent += value + " - ";
+        }
+    });
+
+    KillAllChild(popupField);
+
+    Object.entries(spreadsheetData[selectedPerson]).forEach(([key, value]) => {
+        if (selectedElements.includes(key)) return;
+
+        const p = document.createElement("p");
+        p.textContent = `${key} : ${value}`;
+        popupField.appendChild(p);
+    });
+
+}
 
 
+function hidePopup(){
+    popup.style.display = "none";
+}
 
+function SwitchToPaidClass(){
+    spreadsheetData[selectedPerson].categorie = 2;
+    displayCommandes();
+    hidePopup();
+}
+
+function SwitchToNoneServedClass(){
+    spreadsheetData[selectedPerson].categorie = 1;
+    displayCommandes();
+    hidePopup();
+}
+
+function SwitchToNonePaidClass(){
+    spreadsheetData[selectedPerson].categorie = 0;
+    displayCommandes();
+    hidePopup();
+}
+
+// Don't worry, it's not real child, is it ?
+function KillAllChild(element) {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}
 // Attache la fonction au champ fichier (si pas d'attribut inline dans HTML)
 // document.getElementById("input-excel").addEventListener("change", handleFileSelection);
 // TODO liste : 
@@ -151,7 +237,7 @@ Une fois l'étape précédente validé, il sera sur une page divisé en 2, avec 
 Dans ces deux case ont peut filtrer avec la fonction de distance de leveintein 
 On peut transférer une personne d'un coté ou de l'autre
 En haut il y a le nombre de personne de chaque coté
-Quand on clique sur une personne ca nous affiche tout les informations sur son menu
+!Quand on clique sur une personne ca nous affiche tout les informations sur son menu
 
 
 

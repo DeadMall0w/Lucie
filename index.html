@@ -50,15 +50,41 @@
         </div>
         <div class="category-container"id="category2">
             <h2>Non servi</h2>
-
+            <div id="container2">
+            
+            </div>
         </div>
         <div class="category-container"id="category3">
             <h2>Commande terminé</h2>
-
+            <div id="container3">
+            
+            </div>
         </div>
         
     </div>
 
+    <div id="popup" class="popup">
+        <h2 id="popupTitle">MARIE ANTOINETTE</h2>
+        <fieldset id="popupField" class="element">
+            <p>Email : chloé.bernard@exemple.com</p>
+            <p>Supplément Chips (+0,50€) : Oui</p>
+            <p>Salade : Oui</p>
+            <p>Tomates : Non</p>
+            <p>Oignons frits : Non</p>
+            <p>Sauce : Mayonnaise</p>
+            <p>categorie : 0</p>
+        </fieldset>
+        <div class="popup-buttons">
+            <button class="btn rouge" onclick="SwitchToNonePaidClass()">NON PAYE</button>
+            <button class="btn jaune" onclick="SwitchToNoneServedClass()">NON SERVI</button>
+            <button class="btn vert" onclick="SwitchToPaidClass()">TERMINE</button>
+            <button class="btn gris" onclick="hidePopup()">FERMER</button>
+        </div>
+        <h3>Ajouter des notes : </h3>
+        <label for="noteInput">Entrez les notes : </label>
+        <textarea name="text" rows="5" id="noteInput" placeholder=""></textarea>
+    </div>
+    
 
 </body>
 <script src="script.js"></script>

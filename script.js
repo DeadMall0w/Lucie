@@ -33,6 +33,8 @@ document.addEventListener("keydown", function(e) {
     if (e.key == "Escape"){
         if (isPopupOpen){
             hidePopup();
+        }else{
+            ClearSearchInput();
         }
     }
     // Si on est en train de taper dans un champ texte, on ignore
@@ -48,23 +50,15 @@ document.addEventListener("keydown", function(e) {
         case "Spacebar": // vieux navigateurs
             e.preventDefault(); // Évite le scroll
             break;
-        case "f":
-        case "F":
-            console.log("Touche F pressée");
+        case "f": // prend le focus sur le champ de recherche
+        case "F": 
+            e.preventDefault(); // Évite d'ajouter un f dans le champ de recherche
+            searchInput.focus();
             break;
-        case "Escape":
+        case "Escape": // si le popup est ouvert ca le ferme, sinon ca enlève ce qu'on à recherché
             if (isPopupOpen){
                 hidePopup();
             }
-            break;
-        case "1":
-            console.log("Touche 1 pressée");
-            break;
-        case "2":
-            console.log("Touche 2 pressée");
-            break;
-        case "3":
-            console.log("Touche 3 pressée");
             break;
     }
 });
@@ -177,32 +171,47 @@ function displayCommandes(){
 
 
 function createElements(){
-
+    let total;
+    let cat1;
+    let cat2;
+    let cat3;
+    // count.push()
 
     const searchValue = searchInput.value.trim();
     if(searchValue != ""){
         let filteredData = filterAndSortElements(spreadsheetData, searchValue, 2);
 
+        total = filteredData.length;
         for (let i = 0; i < filteredData.length; i++) {
             if (filteredData[i].data._categorie == 0){
+                cat1 += 1;
                 createCommandeElement(filteredData[i].data, container1, filteredData[i].key);
             }else if(filteredData[i].data._categorie == 1){
                 createCommandeElement(filteredData[i].data, container2, filteredData[i].key);
+                cat2 += 1;
             }else if(filteredData[i].data._categorie == 2){
                 createCommandeElement(filteredData[i].data, container3, filteredData[i].key);
+                cat3 += 1;
             }
         }
     }else{
+        total = spreadsheetData.length;
+
         Object.entries(spreadsheetData).forEach(([key, value]) => {
                 if (value._categorie == 0){
                     createCommandeElement(value, container1, key);
+                    cat1 += 1;
                 }else if(value._categorie == 1){
                     createCommandeElement(value, container2, key);
+                    cat2 += 1;
                 }else if(value._categorie == 2){
                     createCommandeElement(value, container3, key);
+                    cat3 += 1;
                 }
         });
     }
+
+    // console.log(total, )
 }
 
 function filterAndSortElements(elements, searchQuery, threshold = 3) {
@@ -334,6 +343,11 @@ function KillAllChild(element) {
     while (element.firstChild) {
         element.removeChild(element.firstChild);
     }
+}
+
+function ClearSearchInput() {
+    searchInput.value = "";
+    displayCommandes();
 }
 
 

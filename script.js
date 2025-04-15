@@ -72,10 +72,10 @@ document.addEventListener("keydown", function(e) {
 function init(){
 
     // Demande une confirmation avant de faire de recharger la page
-    // window.addEventListener("beforeunload", function (e) {
-    //     e.preventDefault(); // Nécessaire pour certains navigateurs
-    //     e.returnValue = ""; // Obligatoire pour afficher le prompt de confirmation
-    // });
+    window.addEventListener("beforeunload", function (e) {
+        e.preventDefault(); // Nécessaire pour certains navigateurs
+        e.returnValue = ""; // Obligatoire pour afficher le prompt de confirmation
+    });
 
 
     container.style.display = "none";
@@ -234,7 +234,7 @@ function filterAndSortElements(elements, searchQuery, threshold = 3) {
             for (let i = 0; i < selectedElements.length; i++) {
                 fields.push(data[selectedElements[i]]);
             }
-            // console.log(fields);
+
             const distances = fields.map(field =>
                 levenshtein(query, (field || "").toLowerCase())
             );

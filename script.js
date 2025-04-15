@@ -22,6 +22,50 @@ const autoSelectedFields = ["prénom", "prenom", "nom", "promo", "tel"];
 
 
 let selectedPerson = -1;
+let isPopupOpen = false;
+
+
+// ajout des raccourcis clavier 
+document.addEventListener("keydown", function(e) {
+    // Echap est placé ici, car même si on est entrain d'écrire on veut quitter le menu
+    if (e.key == "Escape"){
+        if (isPopupOpen){
+            hidePopup();
+        }
+    }
+    // Si on est en train de taper dans un champ texte, on ignore
+    if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+
+    switch (e.key) {
+        case "Enter":
+            if (isPopupOpen){
+                hidePopup();
+            }
+            break;            
+            case " ":
+        case "Spacebar": // vieux navigateurs
+            e.preventDefault(); // Évite le scroll
+            break;
+        case "f":
+        case "F":
+            console.log("Touche F pressée");
+            break;
+        case "Escape":
+            if (isPopupOpen){
+                hidePopup();
+            }
+            break;
+        case "1":
+            console.log("Touche 1 pressée");
+            break;
+        case "2":
+            console.log("Touche 2 pressée");
+            break;
+        case "3":
+            console.log("Touche 3 pressée");
+            break;
+    }
+});
 
 function init(){
 
@@ -66,6 +110,8 @@ function handleFileSelection(event) {
         // Cache l'input de fichier et génère le <select>
         fileInputContainer.style.display = "none";
         descriptifFields.style.display = "block";
+
+        //TODO : rajouter des vérifications (notamment si des champs ont le nom : _note ou _categorie)
         populateDescriptiveFieldsSelect();
     };
     
@@ -187,7 +233,7 @@ function createCommandeElement(data, parent, id) {
 
 // Fonction appelé quand on clique sur élément 
 function ShowPopup(element){
-    // console.log(spreadsheetData[element.id]);
+    isPopupOpen = true;
     popup.style.display = "block";
     selectedPerson = element.id;
     popupTitle.textContent = "";
@@ -206,7 +252,8 @@ function ShowPopup(element){
     KillAllChild(popupField);
 
     Object.entries(spreadsheetData[selectedPerson]).forEach(([key, value]) => {
-        if (selectedElements.includes(key)) return;
+        // Permet d'enlever les éléments deja affichés, ou ceux qui sont utilisé pour le fonctionnement de l'application (_note, _categorie)
+        if (selectedElements.includes(key) || key == "_note" || key == "_categorie") return;
 
         const p = document.createElement("p");
         p.textContent = `${key} : ${value}`;
@@ -217,6 +264,7 @@ function ShowPopup(element){
 
 
 function hidePopup(){
+    isPopupOpen = false;
     popup.style.display = "none";
     displayCommandes();    
 }
@@ -268,7 +316,7 @@ En haut il y a le nombre de personne de chaque coté
 
 POUVOIR EXPORTER QUI A PAYE OU NON
 
-POSTER LE SITE SUR GITHUB
+*POSTER LE SITE SUR GITHUB
 */
 
 

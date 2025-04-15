@@ -14,9 +14,11 @@ const popupTitle = document.getElementById("popupTitle");
 const popupField = document.getElementById("popupField");
 const noteInput = document.getElementById("noteInput");
 
+const searchInput = document.getElementById("search");
+
 const descriptifFields = document.getElementById("descriptifs-fields");
 
-
+const searchWrapper = document.getElementById("search-wrapper");
 // Champs à sélectionner automatiquement (en minuscules)
 const autoSelectedFields = ["prénom", "prenom", "nom", "promo", "tel"];
 
@@ -80,6 +82,7 @@ function init(){
     descriptifFields.style.display = "none";
     fileInputContainer.style.display = "block";
     popup.style.display = "none";
+    searchWrapper.style.display = "none";
 }
 /*
  * Fonction appelée lors de la sélection d'un fichier Excel par l'utilisateur
@@ -131,6 +134,7 @@ function populateDescriptiveFieldsSelect() {
     selectElement.innerHTML = ""; // vide les options existantes
 
     columnNames.forEach(columnName => {
+        if (columnName == "_note" || columnName == "_categorie") return;
         const option = document.createElement("option");
         option.value = columnName;
         option.textContent = columnName;
@@ -155,13 +159,12 @@ function UserValidateDescriptiveOptions(){
     displayCommandes(); // On instancie toutes les commandes
     descriptifFields.style.display = "none";
     container.style.display = "flex";
+    searchWrapper.style.display = "block";
 }
 
 
 function displayCommandes(){
-    // createCommandeElement();
-    
-    
+
     //! il faut tout supprimer avant 
     KillAllChild(container1);
     KillAllChild(container3);
@@ -174,18 +177,54 @@ function displayCommandes(){
 
 
 function createElements(){
-    Object.entries(spreadsheetData).forEach(([key, value]) => {
-        if (value._categorie == 0){
-            createCommandeElement(value, container1, key);
-        }else if(value._categorie == 1){
-            createCommandeElement(value, container2, key);
-        }else if(value._categorie == 2){
-            createCommandeElement(value, container3, key);
+
+
+    const searchValue = searchInput.value.trim();
+    if(searchValue != ""){
+        let filteredData = filterAndSortElements(spreadsheetData, searchValue, 2);
+
+        for (let i = 0; i < filteredData.length; i++) {
+            if (filteredData[i].data._categorie == 0){
+                createCommandeElement(filteredData[i].data, container1, filteredData[i].key);
+            }else if(filteredData[i].data._categorie == 1){
+                createCommandeElement(filteredData[i].data, container2, filteredData[i].key);
+            }else if(filteredData[i].data._categorie == 2){
+                createCommandeElement(filteredData[i].data, container3, filteredData[i].key);
+            }
         }
-    });
+    }else{
+        Object.entries(spreadsheetData).forEach(([key, value]) => {
+                if (value._categorie == 0){
+                    createCommandeElement(value, container1, key);
+                }else if(value._categorie == 1){
+                    createCommandeElement(value, container2, key);
+                }else if(value._categorie == 2){
+                    createCommandeElement(value, container3, key);
+                }
+        });
+    }
 }
 
+function filterAndSortElements(elements, searchQuery, threshold = 3) {
+    const query = searchQuery.trim().toLowerCase();
 
+    return Object.entries(elements)
+        .map(([key, data]) => {
+
+            let fields = [];
+            for (let i = 0; i < selectedElements.length; i++) {
+                fields.push(data[selectedElements[i]]);
+            }
+            // console.log(fields);
+            const distances = fields.map(field =>
+                levenshtein(query, (field || "").toLowerCase())
+            );
+            const minDistance = Math.min(...distances);
+            return { key, data, distance: minDistance };
+        })
+        .filter(item => item.distance <= threshold)
+        .sort((a, b) =>  a.distance - b.distance);
+}
 
 function createCommandeElement(data, parent, id) {
     const fieldset = document.createElement("div");
@@ -299,6 +338,43 @@ function KillAllChild(element) {
 
 
 
+// fonction pour avoir le nombre de modification minimale entre deux mots (trouvé sur internet)
+function levenshtein(query, target) {
+    if (!query || !target) return Infinity;
+
+    query = query.toLowerCase();
+    target = target.toLowerCase();
+
+    if (target.includes(query)) {
+        return 0; // correspondance partielle directe
+    }
+
+    const m = query.length;
+    const n = target.length;
+    const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (query[i - 1] === target[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = 1 + Math.min(
+                    dp[i - 1][j],    // suppression
+                    dp[i][j - 1],    // insertion
+                    dp[i - 1][j - 1] // substitution
+                );
+            }
+        }
+    }
+
+    return dp[m][n];
+}
+
+
+
 // Attache la fonction au champ fichier (si pas d'attribut inline dans HTML)
 // document.getElementById("input-excel").addEventListener("change", handleFileSelection);
 // TODO liste : 
@@ -307,7 +383,7 @@ function KillAllChild(element) {
 Afficher les données dans un tableau pour être sûr que ca fonctionne bien ?
 *Ensuite le programme va demander quelles sont les champs descriptif (menu de sélection avec des cases à cocher, certaine cases coché de base si elles sont présente nom, email, prenon, classe, ect...)
 *Une fois l'étape précédente validé, il sera sur une page divisé en 2, avec à gauche les personnes qui n'ont pas payé et à droite les personnes qui ont payé 
-Dans ces deux case ont peut filtrer avec la fonction de distance de leveintein 
+*Dans ces deux case ont peut filtrer avec la fonction de distance de leveintein 
 *On peut transférer une personne d'un coté ou de l'autre
 En haut il y a le nombre de personne de chaque coté
 *Quand on clique sur une personne ca nous affiche tout les informations sur son menu

@@ -7,7 +7,13 @@ const selectElement = document.getElementById("descriptif-select");
 const container1 = document.getElementById("container1");
 const container2 = document.getElementById("container2");
 const container3 = document.getElementById("container3");
+
 const container = document.getElementById("container");
+
+const titleCategory1 = document.getElementById("title-cat-1");
+const titleCategory2 = document.getElementById("title-cat-2");
+const titleCategory3 = document.getElementById("title-cat-3");
+
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
@@ -172,9 +178,9 @@ function displayCommandes(){
 
 function createElements(){
     let total;
-    let cat1;
-    let cat2;
-    let cat3;
+    let cat1 = 0;
+    let cat2 = 0;
+    let cat3 = 0;
     // count.push()
 
     const searchValue = searchInput.value.trim();
@@ -211,7 +217,11 @@ function createElements(){
         });
     }
 
-    // console.log(total, )
+
+    titleCategory1.textContent = `Non payé ${cat1}/${total} : ${cat1/total * 100}%`;
+    titleCategory2.textContent = `Non servi ${cat2}/${total} : ${cat2/total * 100}%`;
+    titleCategory3.textContent = `Terminé ${cat3}/${total} : ${cat3/total * 100}%`;
+    console.log(total, cat1, cat2, cat3);
 }
 
 function filterAndSortElements(elements, searchQuery, threshold = 3) {
